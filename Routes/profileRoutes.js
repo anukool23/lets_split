@@ -12,17 +12,27 @@ router.get('/getprofiledetail',async(req,res)=>{
         
         if (req.query.email) {
             userDetail = await UserModel.findOne({ email: req.query.email });
-            return res.status(200).json({"message" : "detail with email found","data": userDetail})
+            if(userDetail){
+                return res.status(200).json({"message" : "detail with email found","status":1,"data": userDetail})
+            }
+            else{
+                return res.status(404).json({ message: 'User not found', "status":0 });
+            }
         } else if (req.query.mobile) {
             userDetail = await UserModel.findOne({ mobile: req.query.mobile });
-            return res.status(200).json({"message" : "detail with mobile found","data": userDetail})
+            if(userDetail){
+                return res.status(200).json({"message" : "detail with mobile found","status":1,"data": userDetail})
+            }
+            else{
+                return res.status(404).json({ message: 'User not found',"status":0 });
+            }
         }
          else {
-            return res.status(404).json({ message: 'Either user not found or there is no email or mobile in query param' });
+            return res.status(404).json({ message: 'Please provide either Email or mobile in Query Param',"status":0 });
         }
     } catch (error) {
         console.error('Error fetching user details:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error',"status":0 });
     }
 })
 
