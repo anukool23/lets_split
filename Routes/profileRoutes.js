@@ -5,6 +5,27 @@ const mongoose = require('mongoose')
 const UserModel = require('../Models/user.model');
 const dateGenerator = require('../Utils/commonUtils');
 
+router.get('/getprofiledetail',async(req,res)=>{
+
+    try {
+        let userDetail = null;
+        
+        if (req.query.email) {
+            userDetail = await UserModel.findOne({ email: req.query.email });
+            return res.status(200).json({"message" : "detail with email found","data": userDetail})
+        } else if (req.query.mobile) {
+            userDetail = await UserModel.findOne({ mobile: req.query.mobile });
+            return res.status(200).json({"message" : "detail with mobile found","data": userDetail})
+        }
+         else {
+            return res.status(404).json({ message: 'Either user not found or there is no email or mobile in query param' });
+        }
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+})
+
 //API to create new user
 router.post('/profile',async (req,res)=>{
     const payload = {

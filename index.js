@@ -20,7 +20,7 @@ app.use("/user",profileRoutes)
 
 
 app.all('*',(req,res)=>{
-    res.send("Not found   1111")
+    res.send("Dummy API get called")
 })
 
 
