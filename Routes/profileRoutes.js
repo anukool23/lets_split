@@ -23,10 +23,18 @@ router.post('/profile',async (req,res)=>{
     }
     
     try {
-        const existingUser = await checkNewUser(payload.email);
-        if (existingUser) {
+        const existingUserEmail = await checkNewUserEmail(payload.email);
+        const existingUserMobile = await checkNewUserMobile(payload.mobile);
+        if (existingUserEmail &&  existingUserMobile) {
+            return res.status(400).json({ message: 'Email and mobile already exists' });
+        }
+        if (existingUserEmail) {
             return res.status(400).json({ message: 'Email already exists' });
         }
+        if (existingUserMobile) {
+            return res.status(400).json({ message: 'Mobile already exists' });
+        }
+
         const newUser = new UserModel(payload);
         const savedUser = await newUser.save();
         console.log(`User saved to DB ${savedUser}`);
@@ -40,7 +48,7 @@ module.exports = router;
 
 
 //function to check if the user already exisit or not
-async function checkNewUser(email) {
+async function checkNewUserEmail(email) {
     try {
         const user = await UserModel.findOne({ email: email });
         if (user) {
@@ -52,6 +60,22 @@ async function checkNewUser(email) {
         }
     } catch (error) {
         console.error('Error while checking email:', error);
+        throw error;
+    }
+}
+
+async function checkNewUserMobile(mobile) {
+    try {
+        const user = await UserModel.findOne({ mobile: mobile });
+        if (user) {
+            console.log('Mobile exists in the database');
+            return user;
+        } else {
+            console.log('Mobile does not exist');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error while checking mobile:', error);
         throw error;
     }
 }

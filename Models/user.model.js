@@ -16,7 +16,13 @@ const userSchema = new mongoose.Schema({
     },
     mobile : { 
         type : String, 
-        required : true
+        required : true,
+        validate: {
+            validator: function(v) {
+                return v.length === 10;
+            },
+            message: props => `${props.value} is not a valid 10-digit mobile number!`
+        }
     },
     gender : { 
         type : String, 
