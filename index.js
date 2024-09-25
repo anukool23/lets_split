@@ -23,6 +23,10 @@ app.all('*',(req,res)=>{
     res.send("Dummy API get called")
 })
 
+app.get("/auth-check", (req,res)=>{
+    const token = req.query.token;
+})
+
 
 app.listen(port, serverIP, async () => {
     await connectToDb();
