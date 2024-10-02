@@ -3,15 +3,14 @@ const jwt = require('jsonwebtoken');
 var salt = bcrypt.genSaltSync(2);
 
 //function to encrypt password
-function encryptPassword(password){
-    let hash = bcrypt.hashSync(password, salt);
+async function encryptPassword(password){
+    let hash = await bcrypt.hash(password, salt);
     return hash
 }
 
 //function to compare password
-function comparePassword(hashed, password){
-    let ans = bcrypt.compareSync(hashed, password);
-    return ans;
+async function comparePassword(hashed, password){
+    return  await bcrypt.compare(password, hashed);
 }
 
 //function tp generate token

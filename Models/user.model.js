@@ -54,6 +54,11 @@ const userSchema = new mongoose.Schema({
     joining_DatenTime : { 
         type : Date, 
         required : true
+    },
+    role:{
+        type:String,
+        enum:["admin","user"],
+        default:"user"
     }
 
 })

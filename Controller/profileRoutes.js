@@ -10,8 +10,10 @@ const encryptPassword = require("../Utils/utils");
 const comparePassword = require("../Utils/utils");
 const tokenGeneration = require("../Utils/utils");
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const authMiddleware = require('../Middlewares/auth.middleware')
 
-profileRoutes.get("/getprofiledetail", async (req, res) => {
+profileRoutes.get("/profile", async (req, res) => {
   try {
     let userDetail = null;
 
@@ -61,7 +63,7 @@ profileRoutes.get("/getprofiledetail", async (req, res) => {
 profileRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req, res) => {
     const payload = req.body
     payload.joining_DatenTime= dateGenerator()
-    payload.password = encryptPassword(payload.password)
+    payload.password =await encryptPassword(payload.password)
   try {
     const newUser = new UserModel(payload);
     const savedUser = await newUser.save();
@@ -75,30 +77,38 @@ profileRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req
 // 3. Login API
 profileRoutes.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  console.log(email,password)
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
+      console.log("User not found",user)
       return res
         .status(404)
         .json({ message: "User not found, Please register first", status: 0 });
     }
-    if(comparePassword(user.password, password)){
-        console.log("1")
-        //let authToken = tokenGeneration(user.email)
-        let authToken = jwt.sign({ userId: user.email}, 'cool',{ expiresIn: 60 * 2});
-        return res.json({ "message": "Login successful", "Status": 1,"token":authToken, "data": user });
-    }
-    else if (!comparePassword(user.password, password)) {
+    console.log("user password is ",user.password)
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log("This is isvalid",isValidPassword)
+    if(!isValidPassword){
       return res
-        .status(404)
-        .json({ message: "Wrong Password, Please try again", status: 0 });
+        .status(400)
+        .json({ message: "Password is wrong", status: 0 });
     }
-    else{
-        return res.status(500).json({message:"Something went wrong"})
-    }
+    const token = jwt.sign({ _id: user._id, email: user.email, mobile:user.mobile, role:user.role }, process.env.SECRET_KEY, { expiresIn: process.env.TOKEN_EXPIRY_IN })
+    res.json({ token, message: "Logged in successfully!", data:{
+      _id: user._id, email: user.email, mobile:user.mobile, role:user.role
+    }  })
+    
   } catch (err) {
+    console.log("error")
     res.status(500).send(err);
   }
 });
+
+profileRoutes.get('/verify-token',authMiddleware, async (req,res)=>{
+  const token = req.headers.authorization;
+  console.log(token)
+  res.send("OK")
+})
 
 module.exports = profileRoutes;
