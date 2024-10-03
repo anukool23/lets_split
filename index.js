@@ -13,20 +13,20 @@ require('dotenv').config()
 const port =process.env.PORT || 3093
 const serverIP = process.env.yourIP === null ? undefined : process.env.yourIP;
 const connectToDb = require("./Config/db")
-const profileRoutes = require("./Controller/profileRoutes")
+const userRoutes = require("./Controller/userRoutes")
 const journeyRoutes = require("./Controller/journeyRoutes")
 const dateGenerator = require('./Utils/commonUtils')
 
-app.use("/user",profileRoutes)
+app.use("/user",userRoutes)
 app.use("/journey",journeyRoutes);
 
 
 app.all('*',(req,res)=>{
-    res.send("Dummy API get called")
+    res.send("This API is not valid, please check your API")
 })
 
-app.get("/auth-check", (req,res)=>{
-    const token = req.query.token;
+app.get("/", (req, res) => {
+    res.status(200).send("Connected")
 })
 
 

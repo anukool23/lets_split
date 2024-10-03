@@ -1,5 +1,5 @@
 const express = require("express");
-const profileRoutes = express.Router();
+const userRoutes = express.Router();
 const connectToDb = require("../Config/db");
 const mongoose = require("mongoose");
 const UserModel = require("../Models/user.model");
@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const authMiddleware = require('../Middlewares/auth.middleware')
 
-profileRoutes.get("/profile", async (req, res) => {
+userRoutes.get("/profile", async (req, res) => {
   try {
     let userDetail = null;
 
@@ -60,7 +60,7 @@ profileRoutes.get("/profile", async (req, res) => {
 });
 
 //2. API to create new user
-profileRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req, res) => {
+userRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req, res) => {
     const payload = req.body
     payload.joining_DatenTime= dateGenerator()
     payload.password =await encryptPassword(payload.password)
@@ -75,7 +75,7 @@ profileRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req
 });
 
 // 3. Login API
-profileRoutes.post("/login", async (req, res) => {
+userRoutes.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log(email,password)
   try {
@@ -105,10 +105,48 @@ profileRoutes.post("/login", async (req, res) => {
   }
 });
 
-profileRoutes.get('/verify-token',authMiddleware, async (req,res)=>{
+userRoutes.get('/verify-token',authMiddleware, async (req,res)=>{
   const token = req.headers.authorization;
-  console.log(token)
-  res.send("OK")
+  // console.log(token)
+  res.status(200).json({token:token,data:req.user})
 })
 
-module.exports = profileRoutes;
+userRoutes.get('/users/:payload', authMiddleware, async (req, res) => {
+  const load = req.params.payload;
+  console.log(load);
+
+  // Regular expression to check if it's an email
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(load);
+  
+  // Regular expression to check if it's a mobile number (adjust based on expected format)
+  const isMobile = /^\d{10}$/.test(load); // assuming mobile number is 10 digits
+
+  let query = {};
+
+  if (isEmail) {
+    query = { email: load }; // search by email
+  } else if (isMobile) {
+    query = { mobile: load }; // search by mobile
+  } else {
+    return res.status(400).json({ message: "Invalid payload format. Expected email or mobile number." });
+  }
+
+  try {
+    const user = await UserModel.findOne(query);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    console.log(user);
+    res.status(200).json({ message: "User found", "user" :{
+      userId:user._id,
+      email : user.email,
+      mobile: user.mobile
+    } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+module.exports = userRoutes;

@@ -5,13 +5,17 @@ const journeySchema = new mongoose.Schema({
         type : String, 
         required : true
     },
-    creator : { 
-        type : String, 
-        required : true, 
-    },
-    users: {
-        type: Array,
-    },
+    creator : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+        immutable: true
+      },
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+      }],
     
     start_date : { 
         type : String
@@ -21,15 +25,18 @@ const journeySchema = new mongoose.Schema({
     },
     createdAt:{
         type: Date,
+        required: true,
+        immutable: true
     },
     updatedAt:{
         type: Date,
         required:true
     },
     last_updatedBy:{
-        type:String,
-        required:true
-    }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+      }
 
 })
 

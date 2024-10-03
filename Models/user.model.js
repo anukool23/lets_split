@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
     },
     age : { 
         type : Number , 
-        min: [0, "Cannot be -ve"]
+        min: [6, "Cannot be -ve"]
     },
     address : { 
         type : String

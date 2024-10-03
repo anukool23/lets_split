@@ -1,4 +1,6 @@
 var jwt = require('jsonwebtoken');
+const mongoose = require('mongoose')
+const UserModel = require('../Models/user.model')
 
 const authMiddleware =async (req,res,next)=>{
     
@@ -10,8 +12,9 @@ const authMiddleware =async (req,res,next)=>{
 
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("The decoded is",decoded)
+        // console.log("The decoded is",decoded)
         req.user = await UserModel.findById(decoded._id);
+        // console.log("req.user is",req.user)
         next()
     } catch (err) {
         res.status(400).json({message:"Invalid token",error:err})
