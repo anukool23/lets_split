@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const authMiddleware = require('../Middlewares/auth.middleware');
 const { createUser } = require("../Controller/userController");
-const { addUsername } = require("../Middlewares/addUsername.middleware");
+const { validateUsername } = require("../Middlewares/validateUsername.middleware");
 
 userRoutes.get("/profile", async (req, res) => {
   try {
@@ -61,7 +61,7 @@ userRoutes.get("/profile", async (req, res) => {
 });
 
 //2. API to create new user
-userRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail,addUsername], async (req, res) => {
+userRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail,validateUsername], async (req, res) => {
    createUser(req, res);
 });
 
