@@ -13,8 +13,8 @@ require('dotenv').config()
 const port =process.env.PORT || 3093
 const serverIP = process.env.yourIP === null ? undefined : process.env.yourIP;
 const connectToDb = require("./Config/db")
-const userRoutes = require("./Controller/userRoutes")
-const journeyRoutes = require("./Controller/journeyRoutes")
+const userRoutes = require("./Routes/userRoutes")
+const journeyRoutes = require("./Routes/journeyRoutes")
 const dateGenerator = require('./Utils/commonUtils')
 
 app.use("/user",userRoutes)

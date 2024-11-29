@@ -17,7 +17,7 @@ const checkNewUserEmail = async (req,res,next)=>{
       }
     } catch (err) {
       console.error("Error while checking email:", err);
-      res.status(500).json({message:"Something went wrong, Please try againa fter sometime",
+      res.status(500).json({message:"Something went wrong, Please try again after sometime",
         error:err})
     }
   }
