@@ -4,14 +4,15 @@ const connectToDb = require("../Config/db");
 const mongoose = require("mongoose");
 const UserModel = require("../Models/user.model");
 const dateGenerator = require("../Utils/commonUtils");
-const checkNewUserMobile =  require("../Middlewares/profileCheckMobile.middleware")
+const checkNewUserMobile =  require("../Middlewares/profileCheckMobile.middleware");
 const checkNewUserEmail =  require("../Middlewares/profileCheckEmail.middleware");
-const encryptPassword = require("../Utils/utils");
 const comparePassword = require("../Utils/utils");
 const tokenGeneration = require("../Utils/utils");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const authMiddleware = require('../Middlewares/auth.middleware')
+const authMiddleware = require('../Middlewares/auth.middleware');
+const { createUser } = require("../Controller/userController");
+const { validateUsername } = require("../Middlewares/validateUsername.middleware");
 
 userRoutes.get("/profile", async (req, res) => {
   try {
@@ -60,18 +61,8 @@ userRoutes.get("/profile", async (req, res) => {
 });
 
 //2. API to create new user
-userRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail], async (req, res) => {
-    const payload = req.body
-    payload.joining_DatenTime= dateGenerator()
-    payload.password =await encryptPassword(payload.password)
-  try {
-    const newUser = new UserModel(payload);
-    const savedUser = await newUser.save();
-    console.log(`User saved to DB ${savedUser}`);
-    res.json(savedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+userRoutes.post("/profile",[checkNewUserMobile,checkNewUserEmail,validateUsername], async (req, res) => {
+   createUser(req, res);
 });
 
 // 3. Login API
@@ -88,7 +79,7 @@ userRoutes.post("/login", async (req, res) => {
     }
     console.log("user password is ",user.password)
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log("This is isvalid",isValidPassword)
+    console.log("This is invalid",isValidPassword)
     if(!isValidPassword){
       return res
         .status(400)
