@@ -4,7 +4,12 @@ const UserModel = require("../Models/user.model");
 //function to check if the user already exisit or not with mobile
 const checkNewUserMobile = async (req,res,next)=>{
   const mobile = req.body.mobile
+  if(mobile.length !== 10){
+    res.status(404).json({message:"Mobile number should be of 10 digits",status:0})
+  }
+  else{
     try {
+      
         const user = await UserModel.findOne({ mobile: mobile });
         if (user) {
           console.log("Mobile exists in the database");
@@ -21,6 +26,7 @@ const checkNewUserMobile = async (req,res,next)=>{
           error:err
         })
       }
+    }
 }
 
 
