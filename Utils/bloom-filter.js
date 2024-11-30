@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const { redisClient } = require("../Config/redis");
+require('dotenv').config()
+
 
 class BloomFilter {
   constructor(size, hashCount) {
@@ -23,7 +25,7 @@ class BloomFilter {
   async alreadyExist(value) {
     for (let i = 0; i < this.hashCount; i++) {
       const index = this.hash(value, i);
-      const bit = await redisClient.getBit(process.env.BLOOM_DB_KEY,index);  // Get bit from Redis
+      const bit = await redisClient.getBit(process.env.BLOOM_DB_KEY,index); 
       if (bit === 0) {
         return false;
       }

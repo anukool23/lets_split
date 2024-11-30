@@ -11,8 +11,10 @@ const tokenGeneration = require("../Utils/utils");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const authMiddleware = require('../Middlewares/auth.middleware');
-const { createUser } = require("../Controller/userController");
+const { createUser, checkUserName } = require("../Controller/userController");
 const { validateUsername } = require("../Middlewares/validateUsername.middleware");
+const checkUsername = require("../Middlewares/checkUsername.middleware");
+const logger = require('../Utils/logger')
 
 userRoutes.get("/profile", async (req, res) => {
   try {
@@ -137,6 +139,12 @@ userRoutes.get('/users/:payload', authMiddleware, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+// API to check if username exist in bloom filter on not
+userRoutes.post("/checkusername", async (req, res) => {
+  logger.info('Request received at /checkusername endpoint');
+  await checkUserName(req, res);
 });
 
 
