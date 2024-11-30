@@ -12,6 +12,10 @@ async function createUser(req, res) {
     payload.joining_DatenTime= dateGenerator()
     payload.password =await encryptPassword(payload.password)
   try {
+    if(payload.mobile.length !== 10){
+      logger.info("Mobile number should be of 10 digits")
+      res.status(404).json({message:"Mobile number should be of 10 digits",status:0})
+    }
     const newUser = new UserModel(payload);
     const savedUser = await newUser.save();
     console.log(`User saved to DB ${savedUser}`);
