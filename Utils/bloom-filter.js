@@ -18,14 +18,14 @@ class BloomFilter {
   async add(value) {
     for (let i = 0; i < this.hashCount; i++) {
       const index = this.hash(value, i);
-      await redisClient.setBit(process.env.BLOOM_DB_KEY, index, 1);  // Set bit in Redis
+      await redisClient.setBit(`${process.env.BLOOM_DB_KEY}_${process.env.ENVIRONMENT}`, index, 1);  // Set bit in Redis
     }
   }
 
   async alreadyExist(value) {
     for (let i = 0; i < this.hashCount; i++) {
       const index = this.hash(value, i);
-      const bit = await redisClient.getBit(process.env.BLOOM_DB_KEY,index); 
+      const bit = await redisClient.getBit(`${process.env.BLOOM_DB_KEY}_${process.env.ENVIRONMENT}`,index); 
       if (bit === 0) {
         return false;
       }
