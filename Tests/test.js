@@ -13,6 +13,6 @@ export const options = {
 };
 
 export default function() {
-  http.get('http://localhost:3092/user/getprofiledetail');
+  http.get('http://localhost:3091/user/getprofiledetail');
   sleep(1);
 }
